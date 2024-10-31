@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Галерея зображень</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      height: 200vh;
+      /* Зроблено для демонстрації прокрутки */
+      overflow-x: hidden;
+      /* Сховати горизонтальну прокрутку */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: #a9a9a9;
+      /* Темніший сірий фон */
+    }
+
+    .navbar {
+      position: relative;
+      background-color: #333;
+      width: 100%;
+    }
+
+    .navbar ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+    }
+
+    .navbar li {
+      position: relative;
+      padding: 15px;
+      color: white;
+      cursor: pointer;
+      /* Змінено на курсор вказівника */
+    }
+
+    .navbar li:hover .submenu {
+      display: block;
+    }
+
+    .submenu {
+      display: none;
+      position: absolute;
+      background-color: #444;
+      padding: 10px;
+      top: 100%;
+      left: 0;
+      z-index: 1;
+    }
+
+    .submenu li {
+      display: none;
+      padding: 10px;
+      color: white;
+    }
+
+    .submenu li:hover {
+      background-color: #555;
+    }
+
+    .scroll-to-top {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+      display: none;
+      z-index: 2;
+      /* Показати поверх інших елементів */
+      transition: transform 0.3s;
+    }
+
+    .scroll-to-top:hover {
+      transform: scale(1.1);
+    }
+
+    .image-container {
+      position: relative;
+      width: 510px;
+      /* Збільшено на 70% */
+      height: 340px;
+      /* Збільшено на 70% */
+      overflow: hidden;
+      margin: 20px auto;
+      background: linear-gradient(-45deg, transparent 32px, rgba(255, 255, 255, 0.5) 0);
+      transition: background 0.5s;
+    }
+
+    .image-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.5;
+      /* Напівпрозора картинка */
+      transition: opacity 0.5s;
+    }
+
+    .image-container:hover img {
+      opacity: 1;
+    }
+
+    .image-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 24px;
+      text-align: center;
+      transition: opacity 0.5s;
+    }
+
+    .image-container:hover .image-text {
+      opacity: 0;
+    }
+
+    .call-to-action {
+      margin: 20px;
+      text-align: center;
+      font-size: 20px;
+      color: #333;
+      background-color: #fff;
+      padding: 15px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .search-container {
+      display: flex;
+      margin: 20px;
+      justify-content: center;
+      align-items: center;
+      z-index: 1;
+      /* Щоб бути поверх зображень */
+    }
+
+    .search-container input {
+      padding: 10px;
+      width: 200px;
+    }
+
+    .search-container button {
+      padding: 10px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    .content {
+      display: none;
+      /* Сховати вміст спочатку */
+      width: 100%;
+    }
+
+    .active {
+      display: block;
+      /* Показати активний вміст */
+    }
+
+    .service-image {
+      width: 100%;
+      height: auto;
+    }
+
+    .header {
+      text-align: center;
+      margin: 20px;
+    }
+
+    .header h1 {
+      font-size: 36px;
+      color: white;
+      /* Білий текст */
+    }
+
+    .description {
+      text-align: center;
+      margin: 20px;
+      font-size: 18px;
+      color: white;
+      /* Білий текст */
+    }
+
+    .gallery {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .gallery img {
+      width: 200px;
+      height: auto;
+      margin: 10px;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    .gallery img::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(128, 128, 128, 0.5);
+      /* Півпрозорий сірий */
+      border-radius: 5px;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+
+    .gallery img:hover::after {
+      opacity: 1;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="navbar">
+    <ul>
+      <li onclick="showPage('home')">Головна</li>
+      <li>Послуги <span>&#9662;</span>
+        <ul class="submenu">
+          <li onclick="showPage('service1')">Заміна мастила</li>
+          <li onclick="showPage('service2')">Діагностика</li>
+          <li onclick="showPage('service3')">Хімчистка</li>
+        </ul>
+      </li>
+      <li onclick="showPage('contacts')">Контакти</li>
+    </ul>
+  </div>
+
+  <div class="search-container">
+    <input type="text" placeholder="Пошук...">
+    <button>Знайти</button>
+  </div>
+
+  <div class="content active" id="home">
+    <div class="header">
+      <h1>Yarik-Vadila</h1>
+      <p>Надійний сервіс для вашого автомобіля!</p>
+    </div>
+    <div class="description">
+      <p>Ми пропонуємо широкий спектр послуг для підтримки вашого авто в ідеальному стані.
+        Наші спеціалісти мають великий досвід у ремонті та обслуговуванні автомобілів.</p>
+    </div>
+    <div class="image-container">
+      <div class="image-text">Твоє авто в хороших руках<3!< /div>
+          <img src="https://t1.ua/photos/articles/2017/07/5956_1_1097.jpg" alt="Зображення 1">
+      </div>
+      <div class="gallery">
+        <img src="https://tutservice.com.ua/wp-content/uploads/2024/01/eevnorae.jpg" alt="Зображення 2">
+        <img src="https://zmist-tech-space.fra1.cdn.digitaloceanspaces.com/2024/08/19b0dd4829aaa6d2c11f6fba9f15e21f.jpg"
+          alt="Зображення 3">
+        <img src="https://www.avtoradosti.com.ua/files/2021/blog/uhod%20za%20salonom/1.jpg" alt="Зображення 4">
+        <img src="https://images.prom.ua/4761411417_w600_h600_navischo-zapravlyati-konditsioner.jpg" alt="Зображення 5">
+        <img src="https://sto-otradnyiy.kiev.ua/wp-content/uploads/2020/06/diagnostika-hodovoj.jpg" alt="Зображення 6">
+      </div>
+      <div class="call-to-action">Скористайтесь нашими послугами та отримайте знижку!</div>
+    </div>
+
+    <div class="content" id="service1">
+      <h2>Послуга 1: Заміна мастила</h2>
+      <img class="service-image" src="https://tutservice.com.ua/wp-content/uploads/2024/01/eevnorae.jpg"
+        alt="Заміна мастила">
+      <p>Професійна заміна мастила для вашого автомобіля.</p>
+    </div>
+
+    <div class="content" id="service2">
+      <h2>Послуга 2: Діагностика</h2>
+      <img class="service-image"
+        src="https://zmist-tech-space.fra1.cdn.digitaloceanspaces.com/2024/08/19b0dd4829aaa6d2c11f6fba9f15e21f.jpg"
+        alt="Діагностика">
+      <p>Комплексна діагностика автомобіля від спеціаліста.</p>
+    </div>
+
+    <div class="content" id="service3">
+      <h2>Послуга 3: Хімчистка</h2>
+      <img class="service-image" src="https://www.avtoradosti.com.ua/files/2021/blog/uhod%20za%20salonom/1.jpg"
+        alt="Хімчистка">
+      <p>Якісна хімчистка салону вашого автомобіля.</p>
+    </div>
+
+    <div class="content" id="contacts">
+      <h2>Контакти</h2>
+      <p>Email: vadila.privet@gmail.com</p>
+      <p>Телефон: +380661337228</p>
+      <p>Адреса: Хотинська 1337, Чернівці, Україна</p>
+      <img src="https://upit.com.ua/images/master.png" alt="Контактне зображення" class="service-image">
+    </div>
+
+    <button class="scroll-to-top" onclick="scrollToTop()">↑</button>
+
+    <script>
+      function showPage(page) {
+        const contents = document.querySelectorAll('.content');
+        contents.forEach(content => {
+          content.classList.remove('active');
+        });
+        document.getElementById(page).classList.add('active');
+      }
+
+      window.onscroll = function () {
+        const button = document.querySelector('.scroll-to-top');
+        if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
+          button.style.display = "block";
+        } else {
+          button.style.display = "none";
+        }
+      };
+
+      function scrollToTop() {
+        window.scrollTo({top: 0, behavior: 'smooth'});
+      }
+    </script>
+
+</body>
+
+</html>
